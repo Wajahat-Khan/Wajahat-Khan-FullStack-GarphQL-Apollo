@@ -1,0 +1,32 @@
+{
+  "name": "employee-assignment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "apollo-server": "^2.10.1",
+    "aws-sdk": "^2.621.0",
+    "camelcase-keys": "^6.1.2",
+    "custom-env": "^1.0.2",
+    "dotenv": "^8.2.0",
+    "graphql": "^14.6.0",
+    "pg": "^7.18.1"
+  },
+  "devDependencies": {
+    "serverless-offline": "^5.12.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wajahat-Khan/Wajahat-Khan-FullStack-GarphQL-Apollo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wajahat-Khan/Wajahat-Khan-FullStack-GarphQL-Apollo/issues"
+  },
+  "homepage": "https://github.com/Wajahat-Khan/Wajahat-Khan-FullStack-GarphQL-Apollo#readme"
+}

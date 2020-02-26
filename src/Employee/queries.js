@@ -36,7 +36,7 @@ const getEmployeeById = id => {
         if (error) {
           reject({ message: 'Failed to retrieve employee Data', error });
         }
-        resolve(camelcaseKeys(results.rows));
+        resolve(amelcaseKeys(results.rows));
       }
     );
   });
@@ -71,8 +71,7 @@ const createNewEmployeeRecord = async body => {
       if (error) {
         reject({ message: 'Failed to insert record', error });
       }
-      console.log(results);
-      resolve({ message: 'Record successfully inserted!!!' });
+      resolve(results.rows);
     });
   });
 };
