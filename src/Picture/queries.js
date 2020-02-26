@@ -183,5 +183,6 @@ module.exports = {
   uploadEmployeeImage,
   getEmployeeImages,
   deleteEmployeeImageById,
-  updateEmployeeImage
+  updateEmployeeImage,
+  getEmployeeImageById
 };

@@ -1,6 +1,6 @@
 const { ApolloServer, gql } = require('apollo-server');
 const {getAllEmployees,getEmployeeById,createNewEmployeeRecord,updateEmployeeData,deleteEmployee} = require('./src/Employee/queries')
-const {getEmployeeImages,getEmployeeImageById} = require('./src/Picture/queries')
+const {getEmployeeImages,getEmployeeImageById,uploadEmployeeImage,deleteEmployeeImageById,updateEmployeeImage} = require('./src/Picture/queries')
 const typeDefs = gql`
   
 scalar Date
@@ -22,13 +22,20 @@ scalar Date
   type Picture {
     id: ID
     name: String
-    date_updated: Date
+    dateUpdated: String
     size: Int
-    s3_url: String
+    s3Url: String
+    employee_id: Int
+  }
+
+  type Picture_return{
+    name: String
+    date: Date
+    size: Int
+    s3Url: String
     employee_id: Int
   }
   type Query {
-    books: [Book]
     employee: [Employee]!
     employeeById (id: ID!) : [Employee]
     pictures: [Picture]
@@ -42,10 +49,20 @@ scalar Date
     experience: Int,
     role:   String
   }
+  
+  input PictureData {
+    image: String
+    id:ID!
+    
+  }
   type Mutation {
     addEmployee (data: EmployeeData): [Employee]
     updateEmployee(id: ID!, data: EmployeeData): [Employee]
     delEmployee(id : ID!): [Employee]
+    
+    addPicture(data: PictureData): [Picture_return]
+    # updatePicture (id: ID!, data: PictureData): [Picture]
+    # delPicture(id:ID!):[Picture]
 }
 `;
 
@@ -82,8 +99,11 @@ scalar Date
         delEmployee: async (_,args)=>{
             result = await  deleteEmployee(args.id)
             return result
+        },
+        addPicture: async (_,args)=>{
+            result = await  uploadEmployeeImage(args)
+            return result
         }
-      
     }
   };
 
