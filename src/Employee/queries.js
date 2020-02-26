@@ -36,7 +36,7 @@ const getEmployeeById = id => {
         if (error) {
           reject({ message: 'Failed to retrieve employee Data', error });
         }
-        resolve(amelcaseKeys(results.rows));
+        resolve(camelcaseKeys(results.rows));
       }
     );
   });
@@ -53,11 +53,12 @@ const updateEmployeeData = (id, body) => {
           role = '${body.role}'
       WHERE
          id = ${id}`;
-    client.query(query, (error, results) => {
+    client.query(query, async (error, results) => {
       if (error) {
         reject({ message: 'Failed to update record', error });
       }
-      resolve({ message: 'Record Successfully Updated !!!', results });
+      let res= await getEmployeeById(id);
+      resolve(camelcaseKeys(res))
     });
   });
 };
@@ -91,14 +92,15 @@ const cascadeDelete = id => {
 const deleteEmployee = id => {
   return new Promise((resolve, reject) => {
     cascadeDelete(id)
-      .then(response => {
+      .then(async response => {
         let query = `DELETE FROM employee WHERE id = ${id} RETURNING *`;
+        let res= await getEmployeeById(id);
         client.query(query, (error, results) => {
           if (error) {
             console.log(error);
             reject({ message: 'Failed to delete record', error });
           }
-          resolve({ message: 'Record Deleted Successfully' });
+          resolve(res);
         });
       })
       .catch(error => {
