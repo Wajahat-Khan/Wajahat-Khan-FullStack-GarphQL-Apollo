@@ -112,6 +112,7 @@ functions:
           path: picture/getEmployeeImages
           method: get
 
+          
   deleteEmployeeImageById:
     handler: src/Picture/delete.deleteEmployeeImageById
     events:

@@ -1,14 +1,10 @@
 const { ApolloServer, gql } = require('apollo-server');
 const {getAllEmployees,getEmployeeById,createNewEmployeeRecord,updateEmployeeData,deleteEmployee} = require('./src/Employee/queries')
-const {getEmployeeImages,getEmployeeImageById,uploadEmployeeImage,deleteEmployeeImageById,updateEmployeeImage} = require('./src/Picture/queries')
+const {getEmployeeImages,uploadEmployeeImage,deleteEmployeeImageById,updateEmployeeImage} = require('./src/Picture/queries')
 const typeDefs = gql`
   
 scalar Date
 
-  type Book {
-    title: String
-    author: String
-  }
 
   type Employee{
     id: ID,
@@ -22,24 +18,17 @@ scalar Date
   type Picture {
     id: ID
     name: String
-    dateUpdated: String
+    date_updated: String
     size: Int
     s3Url: String
     employee_id: Int
   }
 
-  type Picture_return{
-    name: String
-    date: Date
-    size: Int
-    s3Url: String
-    employee_id: Int
-  }
+
   type Query {
     employee: [Employee]!
     employeeById (id: ID!) : [Employee]
     pictures: [Picture]
-    pictureById:[Picture]
   }
   input EmployeeData {
     name:   String,
@@ -60,9 +49,9 @@ scalar Date
     updateEmployee(id: ID!, data: EmployeeData): [Employee]
     delEmployee(id : ID!): [Employee]
     
-    addPicture(data: PictureData): [Picture_return]
-    # updatePicture (id: ID!, data: PictureData): [Picture]
-    # delPicture(id:ID!):[Picture]
+    addPicture(id: ID!, image: String): [Picture]
+    updatePicture (id: ID!, image: String): [Picture]
+    delPicture(id:ID!):[Picture]
 }
 `;
 
@@ -80,11 +69,7 @@ scalar Date
         pictures:async ()=>{
             const result=  await getEmployeeImages();
           return result;
-        },
-        pictureById: async (_,args)=>{
-            result = await getEmployeeImageById(args.id);
-            return result  
-        },  
+        }
 
     },
     Mutation:{
@@ -101,9 +86,26 @@ scalar Date
             return result
         },
         addPicture: async (_,args)=>{
-            result = await  uploadEmployeeImage(args)
+            let body={
+            }
+            body.id=args.id;
+            body.image=args.image
+            result = await  uploadEmployeeImage(body)
             return result
-        }
+        },
+        updatePicture: async (_,args)=>{
+            let body={
+            }
+            body.id=args.id;
+            body.image=args.image
+            result = await  updateEmployeeImage(body)
+            return result
+        },
+        delPicture: async (_,args)=>{
+            result = await  deleteEmployeeImageById(args.id)
+            return result
+        },
+
     }
   };
 

@@ -44,14 +44,14 @@ const uploadEmployeeImage = async body => {
                 size = ${pictureObject.size},
                 s3_url = '${pictureObject.s3_url}'
             WHERE
-               employee_id = ${body.id}`;
+               employee_id = ${body.id} RETURNING *`;
           }
           else {
             query = `INSERT INTO picture(name, date_updated, size, s3_url, employee_id)
             VALUES
-            ('${pictureObject.name}', '${pictureObject.date}', ${pictureObject.size}, '${pictureObject.s3_url}', ${pictureObject.employee_id});`;
+            ('${pictureObject.name}', '${pictureObject.date}', ${pictureObject.size}, '${pictureObject.s3_url}', ${body.id}) RETURNING *`;
           }
-          console.log(pictureObject);
+        
           client.query(query, (error, results) => {
             if (error) {
               reject(
@@ -59,8 +59,9 @@ const uploadEmployeeImage = async body => {
                 error,
                 results
               );
+              
             }
-            resolve({ message: 'Record Successfully inserted' });
+            resolve(results.rows);
           });
         })
         .catch(error => {
@@ -103,7 +104,7 @@ const deleteEmployeeImageById = id => {
         Key: `${id}_${employeeData[0].name.split(' ')[0]}`
       })
         .then(response => {
-          let query = `DELETE FROM picture WHERE employee_id = ${id}`;
+          let query = `DELETE FROM picture WHERE employee_id = ${id} RETURNING *`;
           client.query(query, (error, results) => {
             if (error) {
               reject({
@@ -111,7 +112,7 @@ const deleteEmployeeImageById = id => {
                 error
               });
             }
-            resolve({ message: 'Image Deleted Successfully' });
+            resolve(results.rows);
           });
         })
         .catch(error => {
@@ -153,8 +154,8 @@ const updateEmployeeImage = async body => {
                 size = ${pictureObject.size},
                 s3_url = '${pictureObject.s3_url}'
             WHERE
-               employee_id = ${body.id}`;
-            console.log(pictureObject);
+               employee_id = ${body.id} RETURNING *`;
+           
             client.query(query, (error, results) => {
               if (error) {
                 console.log(error)
@@ -164,7 +165,7 @@ const updateEmployeeImage = async body => {
                   results
                 );
               }
-              resolve({ message: 'Record Successfully inserted' });
+              resolve(results.rows);
             });
           })
           .catch(error => {
