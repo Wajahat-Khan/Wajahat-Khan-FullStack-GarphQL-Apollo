@@ -1,8 +1,5 @@
 require('dotenv').config();
-const Client = require('pg').Client;
 const Sequelize = require('sequelize');
-
-// Option 1: Passing parameters separately
 const sequelize = new Sequelize(`${process.env.DATABASE}`, `${process.env.USER_NAME}`, `${process.env.PASSWORD}`, {
   host: `${process.env.CONNECTION_STRING}`,
   dialect: 'postgres',
@@ -21,7 +18,7 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-  const Employee = sequelize.define('employee', {
+  Employee = sequelize.define('employee', {
     id: {
       type: Sequelize.INTEGER,
       allowNull: false,
@@ -51,40 +48,80 @@ sequelize
     paranoid: true
   });
 
-  Employee.sync().then(()=>{
-    Employee.create({
-      name:'WajahatSEQ',
-      salary:120000,
-      gender:'M',
-      age:22,
-      experience:2,
-      role:"SSE"
-    }).then(newEmp=>{
-      console.log(newEmp)
-      return
+// Employee.sync().then(()=>{
+//     console.log("Employee Table sync complete")
+// });
+
+
+addEmp= async (obj)=>{
+
+    await Employee.create(obj).then(newEmp=>{
+      return(newEmp);
+    }).catch(err=>{
+        return;
+    });
+  
+}
+
+allEmp_params = async (order, sort)=>{
+  const result=[]
+  if(order){  
+  await Employee.findAll({
+      order: [
+        [`${order}`, `${sort}`]
+      ]
+    }).map(e=>{
+      result.push(e.dataValues)
     })
-  }).catch(err=>{
-    console.log("Error ",err);
+    return(result)
+  }
+  else{
+    await Employee.findAll().map(e=>{
+      result.push(e.dataValues)
+    })
+    return(result)
+  }
+}
+allEmp = async ()=>{
+  const result=[]
+    await Employee.findAll().map(e=>{
+      result.push(e.dataValues)
+    })
+    return(result)
+}
+EmpId= async(id)=>{
+  const result=[]
+  await Employee.findAll({
+    where:{
+      id:parseInt(`${id}`)
+    }
+  }).map(e=>{
+    result.push(e.dataValues)
+  })
+    return result;
+}
+updateEmp= async(id, body)=>{
+  const result=[]
+  await Employee.update(body, {where: { id: parseInt(`${id}`) } })
+  .then(updatedMax => {
+    console.log(updatedMax)
   })
 
 
+  // await Employee.findOne({
+    
+  //     id:parseInt(`${id}`)
+    
+  // }).then(res=>{
+  //   let final=res.dataValues.map(e=>{
+  //     e.updateAttributes(body)
+  //   });
+  //   return final;
+  // }).catch(err=>{
+  //   return err;
+  // })
 
+    
+}
 
-
-
-const client = new Client({
-  host: process.env.CONNECTION_STRING,
-  port: process.env.PORT,
-  user: process.env.USER_NAME,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE
-})
-
-client.connect(err => {
-  if (err) {
-    console.error('connection error', err.stack)
-  } else {
-    console.log('Connection Successful to RDS !!!')
-  }
-})
-module.exports = { client, sequelize };
+module.exports={sequelize,addEmp,allEmp,allEmp_params,EmpId,updateEmp}

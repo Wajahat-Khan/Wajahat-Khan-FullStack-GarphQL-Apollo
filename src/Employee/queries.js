@@ -1,82 +1,108 @@
 const { client } = require('../Shared/dbConnection');
 const camelcaseKeys = require('camelcase-keys');
+const {addEmp,allEmp,allEmp_params,EmpId,updateEmp}= require('../Shared/dbConnection')
+
+// const getAllEmployees = params => {
+//   return new Promise((resolve, reject) => {
+//     let query = `SELECT * from employee`;
+//     if (params) {
+//       if (params.sortBy) {
+//         query = query + ` ORDER BY ${params.sortBy}`;
+//         if (params.orderBy) {
+//           query = query + ` ${params.orderBy}`;
+//         }
+//       }
+//       if (params.page) {
+//         query =
+//           query +
+//           ` OFFSET ${(Number(params.page) - 1) * 10} LIMIT ${Number(
+//             params.page
+//           ) * 10}`;
+//       }
+//     }
+//     client.query(query, (error, results) => {
+//       if (error) {
+//         reject({ message: 'Failed to retrieves Employee Data', error });
+//       }
+//       resolve(camelcaseKeys(results.rows));
+//     });
+//   });
+// };
 
 const getAllEmployees = params => {
   return new Promise((resolve, reject) => {
-    let query = `SELECT * from employee`;
     if (params) {
-      if (params.sortBy) {
-        query = query + ` ORDER BY ${params.sortBy}`;
-        if (params.orderBy) {
-          query = query + ` ${params.orderBy}`;
-        }
+      const res= allEmp_params(params.orderBy,params.sortBy);
+      if(res){
+        resolve(res)
       }
-      if (params.page) {
-        query =
-          query +
-          ` OFFSET ${(Number(params.page) - 1) * 10} LIMIT ${Number(
-            params.page
-          ) * 10}`;
+      reject(e)
+    } else{
+      const res= allEmp();
+      if(res){
+        resolve(res)
       }
+      reject(e)
     }
-    client.query(query, (error, results) => {
-      if (error) {
-        reject({ message: 'Failed to retrieves Employee Data', error });
-      }
-      resolve(camelcaseKeys(results.rows));
-    });
-  });
+  })
 };
+
+// const getEmployeeById = id => {
+//   return new Promise((resolve, reject) => {
+//     client.query(
+//       `SELECT * FROM employee WHERE id = ${id}`,
+//       (error, results) => {
+//         if (error) {
+//           reject({ message: 'Failed to retrieve employee Data', error });
+//         }
+//         resolve(camelcaseKeys(results.rows));
+//       }
+//     );
+//   });
+// };
 
 const getEmployeeById = id => {
   return new Promise((resolve, reject) => {
-    client.query(
-      `SELECT * FROM employee WHERE id = ${id}`,
-      (error, results) => {
-        if (error) {
-          reject({ message: 'Failed to retrieve employee Data', error });
-        }
-        resolve(camelcaseKeys(results.rows));
-      }
-    );
+    const res= EmpId(id);
+    if(res){
+      resolve(res)
+    }
+    reject(e)
   });
 };
 
 const updateEmployeeData = (id, body) => {
+  
   return new Promise((resolve, reject) => {
-    let query = `UPDATE employee
-      SET name = '${body.name}',
-          salary = ${body.salary},
-          gender = '${body.gender}',
-          age = ${body.age},
-          experience = ${body.experience},
-          role = '${body.role}'
-      WHERE
-         id = ${id}`;
-    client.query(query, async (error, results) => {
-      if (error) {
-        reject({ message: 'Failed to update record', error });
-      }
-      let res= await getEmployeeById(id);
-      resolve(camelcaseKeys(res))
-    });
+    let res= updateEmp(id, body);
+    if(res) resolve(res)
+    reject(res)
   });
 };
+
+// const createNewEmployeeRecord = async body => {
+//   return new Promise((resolve, reject) => {
+//     let query = `INSERT INTO employee(name, salary, gender, age, experience, role)
+//     VALUES
+//        ('${body.name}', ${body.salary}, '${body.gender}', ${body.age}, ${body.experience}, '${body.role}') RETURNING *;`;
+//     client.query(query, (error, results) => {
+//       if (error) {
+//         reject({ message: 'Failed to insert record', error });
+//       }
+//       resolve(results.rows);
+//     });
+//   });
+// };
 
 const createNewEmployeeRecord = async body => {
   return new Promise((resolve, reject) => {
-    let query = `INSERT INTO employee(name, salary, gender, age, experience, role)
-    VALUES
-       ('${body.name}', ${body.salary}, '${body.gender}', ${body.age}, ${body.experience}, '${body.role}') RETURNING *;`;
-    client.query(query, (error, results) => {
-      if (error) {
-        reject({ message: 'Failed to insert record', error });
+      const res= addEmp(body);
+      if(res){
+        resolve(res)
       }
-      resolve(results.rows);
-    });
+      reject(e)
   });
 };
-
 const cascadeDelete = id => {
   return new Promise((resolve, reject) => {
     let query = `DELETE FROM picture WHERE employee_id = ${id}`;
